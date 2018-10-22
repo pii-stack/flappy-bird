@@ -1,16 +1,32 @@
 let bird,
   pipe = [],
   gameOver = false,
-  canRestart = false;
+  canRestart = false,
+  bgImage,
+  fgImage,
+  scoreSound;
+
+preload = () => {
+  Bird.prototype.sound_flap = loadSound("./sounds/minijump.wav");
+  Pipe.prototype.sound_passed = loadSound("./sounds/chime.mp3");
+  Pipe.prototype.sound_hit = loadSound("./sounds/kick.wav");
+};
 
 setup = () => {
-  createCanvas(400, 600);
+  createCanvas(288, 512);
+  bgImage = loadImage("./images/bg.png");
+  fgImage = loadImage("./images/fg.png");
+  Bird.prototype.img = loadImage("./images/bird.png");
+  Pipe.prototype.img_top = loadImage("./images/pipe_top.png");
+  Pipe.prototype.img_bottom = loadImage("./images/pipe_bottom.png");
+  Bird.prototype.sound_flap.setVolume(0.1);
+
   bird = new Bird();
   pipe.push(new Pipe());
 };
 
 draw = () => {
-  background(0);
+  image(bgImage, 0, 0);
   if (bird.is_dead()) {
     game_isOver();
     bird.draw();
@@ -21,8 +37,8 @@ draw = () => {
     if (gameOver) pipe[i].draw();
 
     if (!gameOver) {
-      pipe[i].update().draw();
-      if (pipe[i].hits(bird)) {
+      pipe[i].update(bird.get_position()).draw();
+      if (pipe[i].hits()) {
         game_isOver();
         bird.kill();
       }
@@ -30,9 +46,12 @@ draw = () => {
     }
   }
 
-  if (frameCount % 100 === 0 && !gameOver) {
-    pipe.push(new Pipe());
-  }
+  if (frameCount % 100 === 0 && !gameOver) pipe.push(new Pipe());
+};
+
+mousePressed = () => {
+  bird.flap();
+  if (gameOver) restart();
 };
 
 keyPressed = () => {

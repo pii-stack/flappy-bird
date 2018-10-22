@@ -9,8 +9,7 @@ class Bird {
   }
 
   draw() {
-    fill(255);
-    ellipse(this.x, this.y, 32, 32);
+    image(this.img, this.x, this.y);
   }
 
   update() {
@@ -22,12 +21,22 @@ class Bird {
   flap() {
     if (this.die) return;
     this.velocity += this.flapForce;
+    this.sound_flap.play();
   }
 
   fall() {
     if (this.die) return;
     this.velocity += this.gravity;
     this.y += max(this.velocity, -10);
+  }
+
+  get_position() {
+    return {
+      x: this.x,
+      width: this.img.width,
+      y: this.y,
+      height: this.img.height
+    };
   }
 
   is_dead() {
